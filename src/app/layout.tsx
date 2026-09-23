@@ -11,8 +11,8 @@ const cairo = Cairo({
 
 export const metadata: Metadata = {
   title: {
-    default: "غَزْل — منصة المتاجر الإلكترونية",
-    template: "%s | غَزْل",
+    default: "متاجر — منصة المتاجر الإلكترونية",
+    template: "%s | متاجر",
   },
   description: "أنشئ متجرك الإلكتروني الخاص في دقائق. منصة عربية متكاملة لإدارة المتاجر والمنتجات والطلبات.",
 };

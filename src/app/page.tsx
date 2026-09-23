@@ -101,7 +101,7 @@ export default async function HomePage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100">
               <span className="text-xl">🧶</span>
             </div>
-            <span className="text-xl font-extrabold text-brand-800">غَزْل</span>
+            <span className="text-xl font-extrabold text-brand-800">متاجر</span>
           </Link>
           <nav className="hidden items-center gap-6 sm:flex">
             <a href="#features" className="text-sm font-semibold text-gray-600 hover:text-gray-900">
@@ -153,7 +153,7 @@ export default async function HomePage() {
             متجرك الإلكتروني
             <br />
             <span className="bg-gradient-to-l from-brand-600 to-accent-500 bg-clip-text text-transparent">
-              يبدأ من غَزْل
+              يبدأ من متاجر
             </span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600 leading-relaxed">
@@ -294,7 +294,7 @@ export default async function HomePage() {
             جاهز لبدء رحلتك؟
           </h2>
           <p className="relative mx-auto mt-4 max-w-xl text-white/80">
-            انضم لمئات التجار الذين يديرون متاجرهم على غَزْل. أنشئ متجرك
+            انضم لمئات التجار الذين يديرون متاجرهم على متاجر. أنشئ متجرك
             مجاناً اليوم.
           </p>
           <Link
@@ -312,10 +312,10 @@ export default async function HomePage() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
             <span className="text-lg">🧶</span>
-            <span className="font-extrabold text-brand-800">غَزْل</span>
+            <span className="font-extrabold text-brand-800">متاجر</span>
           </div>
           <p className="text-sm text-gray-400">
-            © 2026 غَزْل — منصة المتاجر الإلكترونية
+            © 2026 متاجر — منصة المتاجر الإلكترونية
           </p>
         </div>
       </footer>

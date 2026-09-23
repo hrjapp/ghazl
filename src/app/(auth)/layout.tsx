@@ -19,7 +19,7 @@ export default function AuthLayout({
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/70 backdrop-blur-sm shadow-lg">
               <span className="text-3xl">🧶</span>
             </div>
-            <span className="text-2xl font-extrabold text-brand-800">غَزْل</span>
+            <span className="text-2xl font-extrabold text-brand-800">متاجر</span>
           </Link>
         </div>
 
@@ -46,7 +46,7 @@ export default function AuthLayout({
         </div>
 
         <div className="relative z-10 text-sm text-brand-700/70">
-          © 2026 غَزْل — جميع الحقوق محفوظة
+          © 2026 متاجر — جميع الحقوق محفوظة
         </div>
       </div>
 

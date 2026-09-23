@@ -59,7 +59,7 @@ export function DashboardShell({
               </div>
               <div>
                 <span className="block text-lg font-extrabold text-brand-800 leading-none">
-                  غَزْل
+                  متاجر
                 </span>
                 <span className="text-xs text-gray-400">لوحة التحكم</span>
               </div>
@@ -78,7 +78,7 @@ export function DashboardShell({
               <p className="text-xs text-gray-400">المتجر الحالي</p>
               <p className="font-bold text-gray-900 truncate">{storeName}</p>
               <p className="text-xs text-gray-400 truncate" dir="ltr">
-                {storeSlug}.ghazl.sa
+                {storeSlug}.ai-hrj.xyz
               </p>
             </div>
           </div>

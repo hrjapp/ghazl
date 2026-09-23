@@ -179,7 +179,7 @@ export function OnboardingForm({
               </label>
               <div className="flex flex-row-reverse items-stretch overflow-hidden rounded-xl border border-gray-300 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-200">
                 <span className="flex items-center bg-gray-50 px-3 text-sm text-gray-500 border-r border-gray-300">
-                  .ghazl.sa
+                  .ai-hrj.xyz
                 </span>
                 <input
                   id="storeSlug"
@@ -195,7 +195,7 @@ export function OnboardingForm({
                 />
               </div>
               <p className="mt-1.5 text-xs text-gray-400" dir="ltr">
-                رابط متجرك: {slug || "wadi"}.ghazl.sa
+                رابط متجرك: {slug || "wadi"}.ai-hrj.xyz
               </p>
               {state?.errors?.storeSlug && (
                 <p className="mt-1.5 text-sm text-red-600">{state.errors.storeSlug}</p>

@@ -17,7 +17,7 @@ export default function RegisterPage() {
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-100">
             <span className="text-2xl">🧶</span>
           </div>
-          <span className="text-xl font-extrabold text-brand-800">غَزْل</span>
+          <span className="text-xl font-extrabold text-brand-800">متاجر</span>
         </div>
         <h2 className="text-3xl font-extrabold text-gray-900">أنشئ حسابك</h2>
         <p className="mt-2 text-gray-500">

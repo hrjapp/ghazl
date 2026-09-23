@@ -74,7 +74,7 @@ export function StorefrontFooter({ store }: { store: Store }) {
           <span className="block mt-1">
             مدعوم بواسطة{" "}
             <a href={storeHomeUrl} className="font-bold text-brand-600">
-              غَزْل
+              متاجر
             </a>
           </span>
         </div>

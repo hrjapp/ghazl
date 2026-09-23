@@ -14,7 +14,7 @@ export default function LoginPage() {
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-100">
             <span className="text-2xl">🧶</span>
           </div>
-          <span className="text-xl font-extrabold text-brand-800">غَزْل</span>
+          <span className="text-xl font-extrabold text-brand-800">متاجر</span>
         </div>
         <h2 className="text-3xl font-extrabold text-gray-900">تسجيل الدخول</h2>
         <p className="mt-2 text-gray-500">
@@ -81,7 +81,7 @@ export default function LoginPage() {
 
       <div className="mt-8 rounded-xl bg-gray-50 border border-gray-200 px-4 py-3 text-xs text-gray-500">
         <span className="font-semibold text-gray-700">حساب تجريبي:</span>{" "}
-        admin@ghazl.sa / admin123456
+        admin@ai-hrj.xyz / admin123456
       </div>
     </div>
   );

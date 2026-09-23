@@ -179,7 +179,7 @@ export function SettingsForm({
 
       <div className="flex items-center justify-end gap-4">
         <span className="text-sm text-gray-400" dir="ltr">
-          رابط متجرك: {store.slug}.ghazl.sa
+          رابط متجرك: {store.slug}.ai-hrj.xyz
         </span>
         <button
           type="submit"
