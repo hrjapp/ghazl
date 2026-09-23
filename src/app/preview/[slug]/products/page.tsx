@@ -16,7 +16,7 @@ export default async function StorefrontProducts({
   const { cat } = await searchParams;
 
   const store = await prisma.store.findUnique({ where: { slug } });
-  if (!store || store.status === "CLOSED") notFound();
+  if (!store || store.status !== "ACTIVE") notFound();
 
   const categories = await prisma.category.findMany({
     where: { storeId: store.id },

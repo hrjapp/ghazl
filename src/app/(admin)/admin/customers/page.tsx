@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Users } from "lucide-react";
+import { CustomerActions } from "./CustomerActions";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +70,7 @@ export default async function AdminCustomersPage({
                   <th className="p-4">البريد</th>
                   <th className="p-4">الطلبات</th>
                   <th className="p-4">تاريخ التسجيل</th>
+                  <th className="p-4">إجراءات</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -96,6 +98,9 @@ export default async function AdminCustomersPage({
                     </td>
                     <td className="p-4 text-xs text-gray-400 nums">
                       {new Date(c.createdAt).toLocaleDateString("ar-SA")}
+                    </td>
+                    <td className="p-4">
+                      <CustomerActions customerId={c.id} customerName={c.name} />
                     </td>
                   </tr>
                 ))}

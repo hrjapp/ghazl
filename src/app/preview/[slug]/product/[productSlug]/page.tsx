@@ -15,7 +15,7 @@ export default async function ProductDetailPage({
   const { slug, productSlug } = await params;
 
   const store = await prisma.store.findUnique({ where: { slug } });
-  if (!store || store.status === "CLOSED") notFound();
+  if (!store || store.status !== "ACTIVE") notFound();
 
   const product = await prisma.product.findFirst({
     where: { storeId: store.id, slug: productSlug, status: "ACTIVE" },

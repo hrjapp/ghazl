@@ -11,6 +11,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { getStoreDetail } from "@/lib/admin";
+import { prisma } from "@/lib/prisma";
+import { StoreActions } from "./StoreActions";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +58,11 @@ export default async function StoreDetailPage({
   const store = await getStoreDetail(id);
   if (!store) notFound();
 
+  const plans = await prisma.plan.findMany({
+    where: { isActive: true },
+    orderBy: { sortOrder: "asc" },
+  });
+
   const fmtMoney = (n: number) =>
     n.toLocaleString("ar-SA", { style: "currency", currency: "SAR", maximumFractionDigits: 0 });
 
@@ -95,6 +102,16 @@ export default async function StoreDetailPage({
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
+
+      {/* إجراءات إدارية */}
+      <StoreActions
+        storeId={store.id}
+        storeName={store.name}
+        status={store.status}
+        subscriptionId={store.subscriptions[0]?.id ?? null}
+        currentPlanSlug={store.subscriptions[0]?.plan.slug ?? null}
+        plans={plans}
+      />
 
       {/* بطاقات الإحصائيات */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

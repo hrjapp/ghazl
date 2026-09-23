@@ -20,7 +20,7 @@ export default async function StorefrontLayout({
     where: { slug },
   });
 
-  if (!store || store.status === "CLOSED" || store.status === "SUSPENDED") {
+  if (!store || store.status !== "ACTIVE") {
     notFound();
   }
 

@@ -15,7 +15,7 @@ export default async function CheckoutPage({
     where: { slug },
     select: { name: true, status: true },
   });
-  if (!store || store.status === "CLOSED") notFound();
+  if (!store || store.status !== "ACTIVE") notFound();
 
   return <CheckoutForm storeSlug={slug} storeName={store.name} />;
 }
