@@ -187,6 +187,18 @@ model Store {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
+  // ═══ أرشفة محركات البحث (SEO) ═══
+  seoTitle       String?   @db.VarChar(120)
+  seoDescription String?   @db.VarChar(320)
+  seoKeywords    String?   @db.VarChar(255)
+  // هل يُسمح بمحركات البحث بأرشفة المتجر؟
+  seoNoIndex     Boolean   @default(false)
+
+  // ═══ التحكم بالمتجر (صيانة / إغلاق) ═══
+  maintenanceMode  Boolean  @default(false)
+  maintenanceMsg   String?  @db.VarChar(300) // رسالة تظهر للعملاء
+  closedMessage    String?  @db.VarChar(300) // رسالة عند الإغلاق
+
   owner         User               @relation("StoreOwner", fields: [ownerId], references: [id])
   memberships   StoreMember[]
   subscriptions StoreSubscription[]

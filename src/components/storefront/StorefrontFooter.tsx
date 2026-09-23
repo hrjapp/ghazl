@@ -5,7 +5,7 @@ type Store = {
   email: string | null;
   city: string | null;
   address: string | null;
-  socialLinks: unknown;
+  socialLinks: Record<string, string | null> | null;
   slug: string;
 };
 
@@ -66,6 +66,65 @@ export function StorefrontFooter({ store }: { store: Store }) {
                 </span>
               ))}
             </div>
+
+            {/* وسائل التواصل الاجتماعي */}
+            {store.socialLinks && Object.values(store.socialLinks).some((v) => v) && (
+              <div className="mt-5">
+                <h3 className="text-sm font-extrabold text-gray-900">تابعونا</h3>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {store.socialLinks.instagram && (
+                    <a
+                      href={`https://instagram.com/${store.socialLinks.instagram}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-lg bg-gradient-to-br from-fuchsia-500 to-orange-400 px-3 py-1.5 text-xs font-bold text-white"
+                    >
+                      إنستغرام
+                    </a>
+                  )}
+                  {store.socialLinks.twitter && (
+                    <a
+                      href={`https://x.com/${store.socialLinks.twitter}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-lg bg-black px-3 py-1.5 text-xs font-bold text-white"
+                    >
+                      تويتر
+                    </a>
+                  )}
+                  {store.socialLinks.whatsapp && (
+                    <a
+                      href={`https://wa.me/${store.socialLinks.whatsapp}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-lg bg-green-500 px-3 py-1.5 text-xs font-bold text-white"
+                    >
+                      واتساب
+                    </a>
+                  )}
+                  {store.socialLinks.tiktok && (
+                    <a
+                      href={`https://tiktok.com/@${store.socialLinks.tiktok}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-lg bg-gray-800 px-3 py-1.5 text-xs font-bold text-white"
+                    >
+                      تيك توك
+                    </a>
+                  )}
+                  {store.socialLinks.snapchat && (
+                    <a
+                      href={`https://snapchat.com/add/${store.socialLinks.snapchat}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-lg bg-yellow-400 px-3 py-1.5 text-xs font-bold text-black"
+                    >
+                      سناب
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
