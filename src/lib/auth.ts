@@ -92,6 +92,16 @@ export async function requireUser(): Promise<CurrentUser> {
 }
 
 /** تتطلب متجراً نشطاً */
+/**
+ * يتطلب صلاحية مدير المنصة (ADMIN فقط).
+ * المستخدم العادي (MERCHANT) يُحوَّل للوحة تحكم متجره.
+ */
+export async function requireAdmin(): Promise<CurrentUser> {
+  const user = await requireUser();
+  if (user.role !== "ADMIN") redirect("/dashboard");
+  return user;
+}
+
 export async function requireStore(): Promise<{ user: CurrentUser; store: CurrentStore }> {
   const user = await requireUser();
   const store = await getCurrentStore();

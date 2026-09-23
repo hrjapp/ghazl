@@ -128,6 +128,12 @@ export default async function HomePage() {
                   تسجيل الدخول
                 </Link>
                 <Link
+                  href="/admin"
+                  className="hidden sm:flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-bold text-gray-700 transition hover:bg-gray-50"
+                >
+                  لوحة المنصة
+                </Link>
+                <Link
                   href="/register"
                   className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-700"
                 >
