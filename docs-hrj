@@ -1,14 +1,15 @@
-# غَزْل (Ghazl) — منصة متاجر إلكترونية متعددة المستأجرين
+# متاجر — منصة متاجر إلكترونية متعددة المستأجرين
 
 ## 📋 معلومات المشروع
 
 | الحقل | القيمة |
 |---|---|
-| **اسم المشروع** | غَزْل (Ghazl) |
+| **اسم المشروع** | متاجر (سابقاً: غَزْل / Ghazl) |
 | **الوصف** | منصة SaaS لبناء وإدارة المتاجر الإلكترونية متعددة المستأجرين (Multi-Tenant E-commerce Platform) — بديل عربي لمنصة سلة، يحاكي نظامها بالكامل |
 | **تاريخ الإنشاء** | 21 سبتمبر 2026 |
 | **النطاق** | https://ai-hrj.xyz/ghazl (HTTPS + Let's Encrypt) |
 | **المنفذ المحلي** | 3000 (يعمل عبر PM2 باسم `ghazl`) |
+| **مستودع الكود** | https://github.com/hrjapp/ghazl |
 
 ---
 
@@ -49,6 +50,21 @@
 | `/preview/[slug]/cart` | سلة التسوق |
 | `/preview/[slug]/checkout` | إتمام الطلب |
 | `/preview/[slug]/success` | نجاح الطلب |
+| `/admin` | لوحة تحكم المنصة — النظرة العامة (محمية بـ ADMIN) |
+| `/admin/stores` | إدارة جميع المتاجر + بحث وفلترة |
+| `/admin/stores/[id]` | تفاصيل متجر + سجل الاشتراكات الكامل |
+| `/admin/subscriptions` | إدارة الاشتراكات + تنبيهات الانتهاء |
+| `/admin/customers` | عملاء المنصة عبر جميع المتاجر |
+| `/admin/analytics` | التقارير والتحليلات (12 شهراً) |
+
+> ⚠️ **ملاحظة:** `(dashboard)` و `(admin)` و `(auth)` هي **route groups** — الأقواس لا تدخل في مسار URL. مسار لوحة التاجر هو `/products` وليس `/dashboard/products`.
+
+### لوحة تحكم المنصة (Super Admin)
+- **الحماية:** `requireAdmin()` — المستخدم العادي (MERCHANT) يُحوّل لـ `/dashboard`
+- **صلاحية المدير:** `UserRole.ADMIN` في جدول `users`
+- **طبقة البيانات:** `src/lib/admin.ts` — كل الاستعلامات على مستوى المنصة كاملة
+- **الواجهة:** `src/components/admin/AdminShell.tsx` — قائمة جانبية + تنبيهات الانتهاء
+- **الاختبار:** `node scripts/test-admin.js` (Playwright)
 
 ### نظام النطاقات الفرعية (Subdomains)
 - `proxy.ts` يحوّل `mystore.ai-hrj.xyz` → `/preview/mystore`
@@ -90,8 +106,9 @@ node scripts/test-flow.js
 ### الروابط الحية
 - **المنصة:** https://ai-hrj.xyz/ghazl
 - **التسجيل:** https://ai-hrj.xyz/ghazl/register
-- **لوحة التحكم:** https://ai-hrj.xyz/ghazl/dashboard
-- **مثال متجر:** https://ai-hrj.xyz/ghazl/preview/ghazl-test-1790035641932
+- **لوحة تحكم التاجر:** https://ai-hrj.xyz/ghazl/dashboard
+- **لوحة تحكم المنصة (Admin):** https://ai-hrj.xyz/ghazl/admin
+- **مثال متجر:** https://ai-hrj.xyz/ghazl/preview/sss
 
 ### Nginx (مُعدّ بالفعل)
 تكوين في `/etc/nginx/sites-available/ai-hrj.xyz.conf`:
@@ -152,6 +169,8 @@ pm2 status
 - التحقق من كل الأسعار والمخزون **من قاعدة البيانات** في الـ checkout (عدم الثقة بالعميل)
 - عزل `storeId` إلزامي في كل استعلام تجاري
 - حماية مسارات `/dashboard` عبر `requireStore()`
+- حماية مسارات `/admin` عبر `requireAdmin()` — MERCHANT يُحوّل تلقائياً
+- لا يمكن لمدير متجر رؤية بيانات متجر آخر (العزل عبر `memberships`)
 
 ---
 
@@ -161,7 +180,7 @@ pm2 status
 2. خدمة SMS للـ OTP
 3. خدمة تخزين الصور (S3/محلي)
 4. جدول أسعار الشحن حسب المدينة
-5. لوحة تحكم المدير (Admin Panel) لإدارة المنصة
-6. تقارير وتحليلات متقدمة
+5. إجراءات إدارية من اللوحة (إيقاف/تنشيط متجر، تمديد اشتراك، تغيير باقة)
+6. تقارير وتحليلات متقدمة (تصدير CSV/PDF)
 7. تطبيق الجوال / PWA
 8. نظام الكوبونات والخصومات (الجدول موجود)
