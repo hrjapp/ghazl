@@ -1,0 +1,397 @@
+// غَزْل (Ghazl) — منصة متاجر إلكترونية متعددة المستأجرين (Multi-Tenant)
+// كل جدول تجاري يحمل storeId لعزل بيانات كل متجر عن الآخر.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ======================== التعدادات (Enums) ========================
+
+enum UserRole {
+  ADMIN      // مدير المنصة
+  MERCHANT   // تاجر
+}
+
+enum MemberRole {
+  OWNER   // صاحب المتجر
+  ADMIN   // مدير
+  STAFF   // موظف
+}
+
+enum StoreStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING     // بانتظار التأكيد
+  CONFIRMED   // مؤكد
+  PROCESSING  // قيد التجهيز
+  SHIPPED     // مشحون
+  DELIVERED   // تم التوصيل
+  CANCELLED   // ملغي
+  REFUNDED    // مسترجع
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+  FAILED
+  COD // الدفع عند الاستلام
+}
+
+enum PaymentMethod {
+  CARD
+  COD
+  WALLET
+  TRANSFER
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+enum OtpPurpose {
+  REGISTER
+  LOGIN
+  RESET
+}
+
+// ======================== الحسابات (Platform) ========================
+
+model User {
+  id            String       @id @default(uuid())
+  name          String
+  email         String?      @unique
+  phone         String?      @unique
+  passwordHash  String?
+  emailVerified DateTime?
+  phoneVerified DateTime?
+  role          UserRole     @default(MERCHANT)
+  avatarUrl     String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  memberships StoreMember[]
+  stores      Store[]       @relation("StoreOwner")
+  otps        Otp[]
+
+  @@map("users")
+}
+
+// عضوية المستخدم في متجر (يدعم تعدد الموظفين لكل متجر)
+model StoreMember {
+  id       String     @id @default(uuid())
+  storeId  String
+  userId   String
+  role     MemberRole @default(OWNER)
+  invitedAt DateTime? 
+  joinedAt DateTime   @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, userId])
+  @@index([userId])
+  @@map("store_members")
+}
+
+// ======================== الباقات والاشتراكات ========================
+
+model Plan {
+  id           String   @id @default(uuid())
+  slug         String   @unique // free | silver | gold
+  name         String
+  tagline      String?
+  description  String?  @db.Text
+  priceMonthly Decimal  @db.Decimal(10, 2) @default(0)
+  priceYearly  Decimal  @db.Decimal(10, 2) @default(0)
+  currency     String   @default("SAR")
+  // حدود الاستخدام: { maxProducts, maxOrders, maxStaff, hasCustomDomain, ... }
+  limits       Json
+  // المزايا كقائمة نصوص للعرض
+  features     Json
+  isPopular    Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  subscriptions StoreSubscription[]
+
+  @@map("plans")
+}
+
+model StoreSubscription {
+  id         String             @id @default(uuid())
+  storeId    String
+  planId     String
+  status     SubscriptionStatus @default(ACTIVE)
+  startedAt  DateTime           @default(now())
+  expiresAt  DateTime?
+  cancelledAt DateTime?
+  // فترة التجربة
+  trialEndsAt DateTime?
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  plan  Plan  @relation(fields: [planId], references: [id])
+
+  @@index([storeId])
+  @@map("store_subscriptions")
+}
+
+// ======================== المتاجر (Tenants) ========================
+
+model Store {
+  id           String      @id @default(uuid())
+  name         String
+  slug         String      @unique // النطاق الفرعي: mystore
+  customDomain String?     @unique
+  description  String?     @db.Text
+  logoUrl      String?
+  bannerUrl    String?
+  // التخصيص البصري للمتجر
+  theme        Json?       // { primary, accent, font, layout }
+  currency     String      @default("SAR")
+  country      String      @default("SA")
+  city         String?
+  address      String?
+  phone        String?
+  email        String?
+  socialLinks  Json?
+  status       StoreStatus @default(ACTIVE)
+  ownerId      String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  owner         User               @relation("StoreOwner", fields: [ownerId], references: [id])
+  memberships   StoreMember[]
+  subscriptions StoreSubscription[]
+  categories    Category[]
+  products      Product[]
+  customers     Customer[]
+  orders        Order[]
+  discounts     Discount[]
+
+  @@index([ownerId])
+  @@map("stores")
+}
+
+// ======================== الكتالوج (Catalog) ========================
+
+model Category {
+  id        String   @id @default(uuid())
+  storeId   String
+  name      String
+  slug      String
+  parentId  String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  store    Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  parent   Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryChildren")
+  products Product[]
+
+  @@unique([storeId, slug])
+  @@map("categories")
+}
+
+model Product {
+  id          String         @id @default(uuid())
+  storeId     String
+  categoryId  String?
+  name        String
+  slug        String
+  description String?        @db.Text
+  price       Decimal        @db.Decimal(10, 2)
+  comparePrice Decimal?      @db.Decimal(10, 2) // السعر قبل الخصم
+  cost        Decimal?       @db.Decimal(10, 2)
+  sku         String?
+  barcode     String?
+  stock       Int            @default(0)
+  // خصائص مثل: الحجم، اللون (تُخزن كمصفوفة أزواج اسم/قيم)
+  attributes  Json?
+  images      Json?          // ["url1","url2",...]
+  status      ProductStatus  @default(DRAFT)
+  isFeatured  Boolean        @default(false)
+  rating      Float          @default(0)
+  salesCount  Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  store     Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category  Category? @relation(fields: [categoryId], references: [id])
+  orderItems OrderItem[]
+
+  @@unique([storeId, slug])
+  @@index([categoryId])
+  @@map("products")
+}
+
+// ======================== العملاء (Customers) ========================
+
+model Customer {
+  id        String   @id @default(uuid())
+  storeId   String
+  name      String
+  phone     String
+  email     String?
+  notes     String?  @db.Text
+  totalSpent Decimal @db.Decimal(10, 2) @default(0)
+  ordersCount Int    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store    Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orders   Order[]
+  addresses Address[]
+
+  @@unique([storeId, phone])
+  @@map("customers")
+}
+
+model Address {
+  id         String   @id @default(uuid())
+  customerId String
+  storeId    String
+  fullName   String
+  phone      String
+  city       String
+  district   String?
+  street     String?
+  details    String?
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+// ======================== الطلبات (Orders) ========================
+
+model Order {
+  id           String        @id @default(uuid())
+  storeId      String
+  number       String        // رقم الطلب المعروض: GH-1001
+  customerId   String?
+  customerName String        // لاستمرارية البيانات حتى لو حُذف العميل
+  customerPhone String
+  status       OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(UNPAID)
+  paymentMethod PaymentMethod?
+  subtotal     Decimal       @db.Decimal(10, 2)
+  shipping     Decimal       @db.Decimal(10, 2) @default(0)
+  discount     Decimal       @db.Decimal(10, 2) @default(0)
+  total        Decimal       @db.Decimal(10, 2)
+  notes        String?       @db.Text
+  shippingAddress Json?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  store    Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  customer Customer?   @relation(fields: [customerId], references: [id])
+  items    OrderItem[]
+  payment  Payment?
+
+  @@unique([storeId, number])
+  @@index([customerId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String  @id @default(uuid())
+  orderId    String
+  productId  String?
+  name       String  // اسم المنتج وقت الطلب (للاستمرارية)
+  price      Decimal @db.Decimal(10, 2)
+  quantity   Int
+  image      String?
+  // الخصائص المختارة وقت الشراء (الحجم/اللون)
+  variant    Json?
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id        String   @id @default(uuid())
+  orderId   String   @unique
+  storeId   String
+  gateway   String   // moyasar | hyperpay | cod ...
+  reference String?  // مرجع البوابة
+  amount    Decimal  @db.Decimal(10, 2)
+  status    PaymentStatus
+  createdAt DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([storeId])
+  @@map("payments")
+}
+
+// ======================== الخصومات (Discounts) ========================
+
+model Discount {
+  id         String       @id @default(uuid())
+  storeId    String
+  code       String
+  type       DiscountType
+  value      Decimal      @db.Decimal(10, 2)
+  minOrder   Decimal?     @db.Decimal(10, 2)
+  maxUses    Int?
+  usedCount  Int          @default(0)
+  startsAt   DateTime?
+  endsAt     DateTime?
+  isActive   Boolean      @default(true)
+  createdAt  DateTime     @default(now())
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, code])
+  @@map("discounts")
+}
+
+// ======================== التحقق (OTP) ========================
+
+model Otp {
+  id        String     @id @default(uuid())
+  userId    String?
+  phone     String
+  code      String     // في الإنتاج: يُرسل عبر SMS، هنا يُخزن للعرض في الوضع التجريبي
+  purpose   OtpPurpose
+  expiresAt DateTime
+  isUsed    Boolean    @default(false)
+  createdAt DateTime   @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([phone])
+  @@map("otps")
+}

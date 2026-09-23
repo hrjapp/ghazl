@@ -1,0 +1,167 @@
+# غَزْل (Ghazl) — منصة متاجر إلكترونية متعددة المستأجرين
+
+## 📋 معلومات المشروع
+
+| الحقل | القيمة |
+|---|---|
+| **اسم المشروع** | غَزْل (Ghazl) |
+| **الوصف** | منصة SaaS لبناء وإدارة المتاجر الإلكترونية متعددة المستأجرين (Multi-Tenant E-commerce Platform) — بديل عربي لمنصة سلة، يحاكي نظامها بالكامل |
+| **تاريخ الإنشاء** | 21 سبتمبر 2026 |
+| **النطاق** | https://ai-hrj.xyz/ghazl (HTTPS + Let's Encrypt) |
+| **المنفذ المحلي** | 3000 (يعمل عبر PM2 باسم `ghazl`) |
+
+---
+
+## 🏗️ التقنيات المستخدمة (Tech Stack)
+
+| الطبقة | التقنية | الإصدار |
+|---|---|---|
+| **الواجهة الأمامية والخلفية** | Next.js (App Router, Server Actions, TypeScript) | 16.3.5 |
+| **مكتبة الواجهة** | React + Tailwind CSS (RTL) | 19.2.8 / v4 |
+| **قاعدة البيانات** | MySQL (Prisma ORM) | 8.4.11 / 6.19.3 |
+| **المصادقة** | JWT مخصص (مكتبة jose) + bcryptjs | — |
+| **التحقق من البيانات** | Zod | — |
+| **الأيقونات** | lucide-react | — |
+| **الإشعارات** | sonner | — |
+| **إدارة العمليات** | PM2 | 7.0.4 |
+| **الخط العربي** | Cairo (Google Fonts) | — |
+
+---
+
+## 🏛️ المعمارية
+
+### نمط تعدد المستأجرين (Multi-Tenancy)
+- **قاعدة بيانات مشتركة مع عزل على مستوى الصفوف** (Shared DB + `storeId` discriminator)
+- كل جدول تجاري يحمل عمود `storeId` ويتم تصفيته تلقائياً في كل استعلام
+- عزل كامل لبيانات كل متجر (منتجات، طلبات، عملاء، مدفوعات)
+
+### المسارات الرئيسية
+
+| المسار | الوظيفة |
+|---|---|
+| `/` | الصفحة الرئيسية للمنصة (Landing) |
+| `/register` + `/login` | تسجيل ودخول التجار |
+| `/onboarding` | إنشاء المتجر + اختيار الباقة |
+| `/dashboard/*` | لوحة تحكم التاجر (محمية) |
+| `/preview/[slug]` | واجهة المتجر للعملاء |
+| `/preview/[slug]/products` | صفحة المنتجات |
+| `/preview/[slug]/product/[slug]` | صفحة تفاصيل المنتج |
+| `/preview/[slug]/cart` | سلة التسوق |
+| `/preview/[slug]/checkout` | إتمام الطلب |
+| `/preview/[slug]/success` | نجاح الطلب |
+
+### نظام النطاقات الفرعية (Subdomains)
+- `proxy.ts` يحوّل `mystore.ai-hrj.xyz` → `/preview/mystore`
+- في التطوير: استخدام `/preview/[slug]` مباشرة
+
+---
+
+## 💳 الباقات (Plans)
+
+| الباقة | السعر شهرياً | المنتجات | المزايا |
+|---|---|---|---|
+| **المجاني** | 0 ر.س | 25 | أساسية |
+| **الفضي** | 99 ر.س | 500 | متقدمة + خصومات |
+| **الذهبي** | 249 ر.س | غير محدودة | كاملة + تسويق |
+
+---
+
+## 🗄️ قاعدة البيانات
+
+15 جدول: `users, stores, store_members, plans, store_subscriptions, categories, products, customers, addresses, orders, order_items, payments, discounts, otps, _prisma_migrations`
+
+### الأوامر
+
+```bash
+# الهجرة
+npx prisma migrate dev --name init
+
+# زرع الباقات
+npx tsx prisma/seed.ts
+
+# اختبار الرحلة الكاملة
+node scripts/test-flow.js
+```
+
+---
+
+## 🚀 التشغيل والإدارة
+
+### الروابط الحية
+- **المنصة:** https://ai-hrj.xyz/ghazl
+- **التسجيل:** https://ai-hrj.xyz/ghazl/register
+- **لوحة التحكم:** https://ai-hrj.xyz/ghazl/dashboard
+- **مثال متجر:** https://ai-hrj.xyz/ghazl/preview/ghazl-test-1790035641932
+
+### Nginx (مُعدّ بالفعل)
+تكوين في `/etc/nginx/sites-available/ai-hrj.xyz.conf`:
+```nginx
+location ^~ /ghazl {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    ...
+}
+```
+> **مهم:** `^~` إلزامي — بدونه تعترض قاعدة regex `^/([a-zA-Z0-9_-]+)/` المسارات الفرعية وتُرجع 404.
+
+### basePath — قاعدة ذهبية ⚠️
+المشروع يستخدم `basePath: "/ghazl"` في `next.config.ts`. **لا تكتب `/ghazl` يدوياً في أي رابط** (redirect / href / router.push) — Next.js يضيفه تلقائياً عند البناء. كتابته يدوياً تنتج `/ghazl/ghazl/register` → **404**.
+- ✅ صحيح: `redirect("/login")` → يصبح `/ghazl/login`
+- ❌ خطأ: `redirect("/ghazl/login")` → يصبح `/ghazl/ghazl/login`
+- استخدم `scripts/strip-basepath.js` للتنظيف إن لزم.
+
+```bash
+# تشغيل (يعمل الآن)
+pm2 start "npx next start -p 3000" --name ghazl
+
+# إعادة التشغيل بعد التحديثات
+pm2 restart ghazl
+
+# السجلات
+pm2 logs ghazl
+
+# الحالة
+pm2 status
+```
+
+### متغيرات البيئة (.env)
+- `DATABASE_URL` — اتصال MySQL
+- `AUTH_SECRET` — مفتاح تشفير JWT (سري!)
+- `STORE_DOMAIN` — نطاق المتاجر (ai-hrj.xyz)
+- `PAYMENT_GATEWAY` — بوابة الدفع (فارغة حالياً)
+
+---
+
+## ⚠️ ملاحظات تشغيلية مهمة
+
+1. **الدفع عند الاستلام (COD)** مُفعّل الآن — بوابة الدفع بالبطاقات **غير مفعّلة بعد** (تحتاج مفتاح API من بوابة مثل مدى/HyperPay/STC Pay)
+2. **OTP عبر الجوال** مُصمّم في قاعدة البيانات (جدول `otps`) لكن **غير مربوط بخدمة SMS** — التوثيق حالياً بالبريد/كلمة المرور
+3. **رفع الصور** يتم عبر روابط مباشرة (URL) — **غير مربوط بخدمة تخزين** (S3/محلي) بعد
+4. **الشحن** ثابت حالياً (مجاني) — يحتاج جدول أسعار شحن حسب المدينة/الوزن
+5. **AUTH_SECRET** يجب تغييره في الإنتاج (الحالي عشوائي ومولّد محلياً)
+6. Prisma 8 متاح كـ RC لكننا نستخدم **6.19.3 المستقر** عمداً
+
+---
+
+## 🔐 الأمان
+
+- كلمات المرور مشفّرة (bcrypt, 10 rounds)
+- جلسات JWT في كوكيز HttpOnly + SameSite + Secure (في الإنتاج)
+- التحقق من كل الأسعار والمخزون **من قاعدة البيانات** في الـ checkout (عدم الثقة بالعميل)
+- عزل `storeId` إلزامي في كل استعلام تجاري
+- حماية مسارات `/dashboard` عبر `requireStore()`
+
+---
+
+## 📈 الخطوات التالية (Backlog)
+
+1. بوابة دفع فعلية (مدى/STC Pay/HyperPay)
+2. خدمة SMS للـ OTP
+3. خدمة تخزين الصور (S3/محلي)
+4. جدول أسعار الشحن حسب المدينة
+5. لوحة تحكم المدير (Admin Panel) لإدارة المنصة
+6. تقارير وتحليلات متقدمة
+7. تطبيق الجوال / PWA
+8. نظام الكوبونات والخصومات (الجدول موجود)

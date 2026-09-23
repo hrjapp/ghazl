@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #ffffff;
+  --color-foreground: #171717;
+  --font-sans: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+  --font-cairo: var(--font-cairo);
+
+  /* ألوان علامة غَزْل (باستيل: فستقي + وردي) */
+  --color-brand-50: #f3faf4;
+  --color-brand-100: #e3f5e7;
+  --color-brand-200: #c8ebd1;
+  --color-brand-300: #9fddae;
+  --color-brand-400: #6dc785;
+  --color-brand-500: #45ab63;
+  --color-brand-600: #328b4e;
+  --color-brand-700: #2a6f41;
+  --color-brand-800: #265836;
+  --color-brand-900: #21482e;
+
+  --color-accent-100: #fce7f1;
+  --color-accent-200: #f9d0e4;
+  --color-accent-300: #f4a8cd;
+  --color-accent-400: #ec72ab;
+  --color-accent-500: #e04a8d;
+  --color-accent-600: #c52f71;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* أرقام عربية متناسقة */
+.nums {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+/* شريط تمرير لطيف */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* تأثير ظهور لطيف */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.35s ease-out both;
+}
