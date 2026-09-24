@@ -6,6 +6,7 @@ import { StorefrontProvider } from "@/components/storefront/StorefrontProvider";
 import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
 import { StorefrontFooter } from "@/components/storefront/StorefrontFooter";
 import { Wrench } from "lucide-react";
+import { getCurrentCustomer } from "@/lib/customer-session";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +61,9 @@ export default async function StorefrontLayout({
 
   const currency = store.currency;
 
+  // العميل الحالي (لإظهار اسمه في الهيدر)
+  const customer = await getCurrentCustomer(store.id);
+
   // ═══ وضع الصيانة ═══
   if (store.maintenanceMode) {
     return (
@@ -96,6 +100,7 @@ export default async function StorefrontLayout({
           slug={store.slug}
           logoUrl={store.logoUrl}
           currency={currency}
+          customerName={customer?.name}
         />
         <main className="flex-1">{children}</main>
         <StorefrontFooter

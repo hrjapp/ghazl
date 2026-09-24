@@ -272,17 +272,20 @@ model Customer {
   name      String
   phone     String
   email     String?
+  passwordHash String? @db.Text
   notes     String?  @db.Text
   totalSpent Decimal @db.Decimal(10, 2) @default(0)
   ordersCount Int    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  store    Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  orders   Order[]
+  store     Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orders    Order[]
   addresses Address[]
+  sessions  CustomerSession[]
 
   @@unique([storeId, phone])
+  @@unique([storeId, email])
   @@map("customers")
 }
 
@@ -417,4 +420,21 @@ model PlatformSetting {
   updatedAt DateTime @updatedAt
 
   @@map("platform_settings")
+}
+
+// ======================== جلسات عملاء المتاجر ========================
+
+model CustomerSession {
+  id         String   @id @default(uuid())
+  token      String   @unique
+  customerId String
+  storeId    String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@index([storeId])
+  @@map("customer_sessions")
 }

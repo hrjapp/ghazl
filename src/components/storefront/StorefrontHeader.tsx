@@ -1,19 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, User } from "lucide-react";
 import { useCart } from "./StorefrontProvider";
+import { usePathname } from "next/navigation";
 
 export function StorefrontHeader({
   storeName,
   slug,
   logoUrl,
+  customerName,
 }: {
   storeName: string;
   slug: string;
   logoUrl: string | null;
   currency: string;
+  customerName?: string | null;
 }) {
   const { itemCount } = useCart();
   const pathname = usePathname();
@@ -65,18 +67,35 @@ export function StorefrontHeader({
           })}
         </nav>
 
-        <Link
-          href={`/preview/${slug}/cart`}
-          className="relative flex items-center gap-2 rounded-xl border border-gray-200 px-3.5 py-2.5 font-semibold text-gray-700 transition hover:bg-gray-50"
-        >
-          <ShoppingBag className="h-5 w-5" />
-          <span className="hidden sm:inline">السلة</span>
-          {itemCount > 0 && (
-            <span className="absolute -top-2 -left-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent-500 text-xs font-bold text-white nums">
-              {itemCount}
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/preview/${slug}/auth`}
+            className={`flex items-center gap-2 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition ${
+              pathname.includes("/auth") || pathname.includes("/account")
+                ? "bg-brand-50 text-brand-700"
+                : "text-gray-700 hover:bg-gray-50"
+            }`}
+            title={customerName ? `حسابي — ${customerName}` : "حسابي"}
+          >
+            <User className="h-5 w-5" />
+            <span className="hidden max-w-[80px] truncate sm:inline">
+              {customerName || "حسابي"}
             </span>
-          )}
-        </Link>
+          </Link>
+
+          <Link
+            href={`/preview/${slug}/cart`}
+            className="relative flex items-center gap-2 rounded-xl border border-gray-200 px-3.5 py-2.5 font-semibold text-gray-700 transition hover:bg-gray-50"
+          >
+            <ShoppingBag className="h-5 w-5" />
+            <span className="hidden sm:inline">السلة</span>
+            {itemCount > 0 && (
+              <span className="absolute -top-2 -left-2 flex h-6 w-6 items-center justify-center rounded-full bg-accent-500 text-xs font-bold text-white nums">
+                {itemCount}
+              </span>
+            )}
+          </Link>
+        </div>
       </div>
     </header>
   );

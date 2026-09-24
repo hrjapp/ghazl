@@ -24,6 +24,8 @@ const RESERVED_PATHS = [
   "/verify",
   "/otp",
   "/storefront",
+  "/auth",
+  "/account",
 ];
 
 export function proxy(request: NextRequest) {
