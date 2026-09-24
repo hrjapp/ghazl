@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 import { updateStoreByAdminAction } from "@/app/actions/admin-store";
-import { Store as StoreIcon, Globe, Wrench, ChevronDown } from "lucide-react";
+import { Store as StoreIcon, Globe, Wrench, ChevronDown, ExternalLink } from "lucide-react";
 
 type StoreData = {
   id: string;
@@ -103,19 +103,23 @@ function StoreEditForm({ store }: { store: StoreData }) {
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-              رابط المتجر *
+              رابط المتجر (النطاق الفرعي) *
             </label>
-            <div className="flex items-center gap-2" dir="ltr">
+            <div className="flex items-center overflow-hidden rounded-xl border border-gray-300 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-200">
               <input
                 name="slug"
                 defaultValue={store.slug}
                 required
-                className={`${inputCls} text-left`}
+                dir="ltr"
+                className="w-full bg-transparent px-4 py-2.5 text-left text-sm outline-none"
               />
-              <span className="text-xs text-gray-400 whitespace-nowrap">
+              <span className="border-r border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-semibold text-gray-400 whitespace-nowrap">
                 .ai-hrj.xyz
               </span>
             </div>
+            <p className="mt-1.5 text-xs text-gray-400" dir="ltr">
+              {store.slug}.ai-hrj.xyz/ghazl/preview/{store.slug}
+            </p>
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-gray-700">
@@ -236,7 +240,16 @@ function StoreEditForm({ store }: { store: StoreData }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3 border-t border-gray-100 pt-5">
+      <div className="flex items-center justify-between gap-3 border-t border-gray-100 pt-5">
+        <a
+          href={`/preview/${store.slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-5 py-3 text-sm font-bold text-gray-600 transition hover:bg-gray-50"
+        >
+          <ExternalLink className="h-4 w-4" />
+          فتح المتجر
+        </a>
         <button
           type="submit"
           disabled={pending}
