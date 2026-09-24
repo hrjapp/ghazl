@@ -12,7 +12,9 @@ import {
 } from "lucide-react";
 import { getStoreDetail } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
+import { getPlatformSetting } from "@/lib/platform-settings";
 import { StoreActions } from "./StoreActions";
+import { StoreEditSection } from "./StoreEditSection";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +71,8 @@ export default async function StoreDetailPage({
   const currentSub = store.subscriptions[0];
   const daysLeft = currentSub?.expiresAt ? daysUntil(currentSub.expiresAt) : null;
 
+  const siteDomain = await getPlatformSetting("siteDomain", "ai-hrj.xyz");
+
   return (
     <div className="space-y-6">
       {/* رأس الصفحة */}
@@ -111,6 +115,18 @@ export default async function StoreDetailPage({
         subscriptionId={store.subscriptions[0]?.id ?? null}
         currentPlanSlug={store.subscriptions[0]?.plan.slug ?? null}
         plans={plans}
+      />
+
+      {/* تعديل بيانات المتجر */}
+      <StoreEditSection
+        store={{
+          ...store,
+          seoTitle: store.seoTitle ?? "",
+          seoDescription: store.seoDescription ?? "",
+          seoKeywords: store.seoKeywords ?? "",
+          maintenanceMsg: store.maintenanceMsg ?? "",
+        }}
+        siteDomain={siteDomain}
       />
 
       {/* بطاقات الإحصائيات */}

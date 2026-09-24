@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 import { updateStoreByAdminAction } from "@/app/actions/admin-store";
-import { Store as StoreIcon, Globe, Wrench, ChevronDown, ExternalLink } from "lucide-react";
+import { Store as StoreIcon, Globe, Wrench, ExternalLink } from "lucide-react";
 
 type StoreData = {
   id: string;
@@ -20,53 +19,21 @@ type StoreData = {
   maintenanceMsg: string;
 };
 
-export function StoreSettingsClient({
+export function StoreEditSection({
+  store,
   siteDomain,
-  stores,
 }: {
+  store: StoreData;
   siteDomain: string;
-  stores: StoreData[];
 }) {
-  const [selectedId, setSelectedId] = useState(stores[0]?.id ?? "");
-  const selected = stores.find((s) => s.id === selectedId) ?? stores[0];
-
-  if (!selected) {
-    return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center text-sm text-gray-400">
-        لا توجد متاجر بعد.
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-5">
       <div className="flex items-center gap-2.5">
         <StoreIcon className="h-5 w-5 text-brand-600" />
-        <h2 className="text-xl font-extrabold text-gray-900">إدارة المتاجر</h2>
+        <h2 className="text-xl font-extrabold text-gray-900">تعديل بيانات المتجر</h2>
       </div>
 
-      {/* اختيار المتجر */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5">
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
-          اختر المتجر
-        </label>
-        <div className="relative">
-          <select
-            value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
-            className="w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-2.5 pl-10 text-sm font-semibold outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
-          >
-            {stores.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name} — {s.slug}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-        </div>
-      </div>
-
-      <StoreEditForm key={selected.id} store={selected} siteDomain={siteDomain} />
+      <StoreEditForm key={store.id} store={store} siteDomain={siteDomain} />
     </div>
   );
 }
