@@ -6,7 +6,7 @@ import {
   updateUserByAdminAction,
   deleteUserByAdminAction,
 } from "@/app/actions/admin-users";
-import { Pencil, Trash2, X, ShieldCheck, Store as StoreIcon } from "lucide-react";
+import { Pencil, Trash2, X, Store as StoreIcon } from "lucide-react";
 
 type UserData = {
   id: string;
@@ -18,15 +18,15 @@ type UserData = {
   stores: { id: string; name: string; slug: string; status: string }[];
 };
 
-export function UsersTable({
-  users,
+export function MerchantsTable({
+  merchants,
   currentUserId,
 }: {
-  users: UserData[];
+  merchants: UserData[];
   currentUserId: string;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
-  const editing = users.find((u) => u.id === editingId);
+  const editing = merchants.find((u) => u.id === editingId);
 
   if (editing) {
     return (
@@ -37,10 +37,10 @@ export function UsersTable({
     );
   }
 
-  if (users.length === 0) {
+  if (merchants.length === 0) {
     return (
       <div className="rounded-2xl border border-gray-200 bg-white p-12 text-center">
-        <p className="text-sm text-gray-400">لا يوجد مستخدمون مطابقون.</p>
+        <p className="text-sm text-gray-400">لا يوجد تجار مطابقون.</p>
       </div>
     );
   }
@@ -51,16 +51,15 @@ export function UsersTable({
         <table className="w-full text-right">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50/60 text-xs font-bold text-gray-500">
-              <th className="p-4">المستخدم</th>
+              <th className="p-4">التاجر</th>
               <th className="p-4">الهاتف</th>
-              <th className="p-4">الدور</th>
               <th className="p-4">المتاجر</th>
               <th className="p-4">تاريخ التسجيل</th>
               <th className="p-4">إجراءات</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
+            {merchants.map((u) => (
               <tr
                 key={u.id}
                 className="border-b border-gray-50 transition last:border-0 hover:bg-gray-50/50"
@@ -73,18 +72,6 @@ export function UsersTable({
                 </td>
                 <td className="p-4 text-sm text-gray-600 nums" dir="ltr">
                   {u.phone || "—"}
-                </td>
-                <td className="p-4">
-                  {u.role === "ADMIN" ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2.5 py-1 text-xs font-bold text-purple-700">
-                      <ShieldCheck className="h-3 w-3" />
-                      مدير
-                    </span>
-                  ) : (
-                    <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-bold text-blue-700">
-                      تاجر
-                    </span>
-                  )}
                 </td>
                 <td className="p-4">
                   {u.stores.length === 0 ? (

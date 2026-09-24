@@ -1,10 +1,10 @@
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { UsersTable } from "./UsersTable";
+import { MerchantsTable } from "./MerchantsTable";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminUsersPage({
+export default async function AdminMerchantsPage({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string }>;
@@ -12,17 +12,21 @@ export default async function AdminUsersPage({
   const user = await requireAdmin();
   const { q } = await searchParams;
 
-  const where = q
-    ? {
-        OR: [
-          { name: { contains: q } },
-          { email: { contains: q } },
-          { phone: { contains: q } },
-        ],
-      }
-    : {};
+  // ── أصحاب المتاجر فقط (التجار)، لا مديري المنصة ──
+  const where = {
+    role: "MERCHANT" as const,
+    ...(q
+      ? {
+          OR: [
+            { name: { contains: q } },
+            { email: { contains: q } },
+            { phone: { contains: q } },
+          ],
+        }
+      : {}),
+  };
 
-  const users = await prisma.user.findMany({
+  const merchants = await prisma.user.findMany({
     where,
     orderBy: { createdAt: "desc" },
     select: {
@@ -42,9 +46,9 @@ export default async function AdminUsersPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-gray-900">المستخدمون</h1>
+        <h1 className="text-2xl font-extrabold text-gray-900">أصحاب المتاجر</h1>
         <p className="mt-1 text-sm text-gray-500">
-          إدارة التجار وأصحاب المتاجر — تعديل، حذف، وتغيير كلمة المرور.
+          التجار المسجلون في المنصة — تعديل، إيقاف، حذف، وتغيير كلمة المرور.
         </p>
       </div>
 
@@ -63,7 +67,7 @@ export default async function AdminUsersPage({
         </button>
       </form>
 
-      <UsersTable users={users} currentUserId={user.id} />
+      <MerchantsTable merchants={merchants} currentUserId={user.id} />
     </div>
   );
 }
