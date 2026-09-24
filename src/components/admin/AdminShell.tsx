@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   ExternalLink,
+  Settings,
 } from "lucide-react";
 
 const NAV = [
@@ -21,6 +22,7 @@ const NAV = [
   { href: "/admin/subscriptions", label: "الاشتراكات", icon: CreditCard },
   { href: "/admin/customers", label: "العملاء", icon: Users },
   { href: "/admin/analytics", label: "التقارير", icon: TrendingUp },
+  { href: "/admin/settings", label: "الإعدادات", icon: Settings },
 ];
 
 export function AdminShell({
