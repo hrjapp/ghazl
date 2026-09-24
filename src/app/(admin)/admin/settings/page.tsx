@@ -1,14 +1,16 @@
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getPlatformSetting } from "@/lib/platform-settings";
 import { AdminSettingsClient } from "./AdminSettingsClient";
 import { StoreSettingsClient } from "./StoreSettingsClient";
+import { PlatformSettingsClient } from "./PlatformSettingsClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
   await requireAdmin();
 
-  const [plans, stores] = await Promise.all([
+  const [plans, stores, siteDomain, siteName] = await Promise.all([
     prisma.plan.findMany({ orderBy: { sortOrder: "asc" } }),
     prisma.store.findMany({
       orderBy: { createdAt: "desc" },
@@ -26,6 +28,8 @@ export default async function AdminSettingsPage() {
         maintenanceMsg: true,
       },
     }),
+    getPlatformSetting("siteDomain", "ai-hrj.xyz"),
+    getPlatformSetting("siteName", "غَزْل"),
   ]);
 
   return (
@@ -33,12 +37,16 @@ export default async function AdminSettingsPage() {
       <div>
         <h1 className="text-2xl font-extrabold text-gray-900">الإعدادات</h1>
         <p className="mt-1 text-sm text-gray-500">
-          تحكم المنصة — المتاجر، الخطط، العملة، والأرشفة.
+          تحكم المنصة — الدومين، المتاجر، الخطط، والعملة.
         </p>
       </div>
 
+      {/* قسم إعدادات المنصة: الدومين الرئيسي */}
+      <PlatformSettingsClient siteDomain={siteDomain} siteName={siteName} />
+
       {/* قسم المتاجر: اسم، رابط، أرشفة، صيانة */}
       <StoreSettingsClient
+        siteDomain={siteDomain}
         stores={stores.map((s) => ({
           id: s.id,
           name: s.name,

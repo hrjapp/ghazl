@@ -20,7 +20,13 @@ type StoreData = {
   maintenanceMsg: string;
 };
 
-export function StoreSettingsClient({ stores }: { stores: StoreData[] }) {
+export function StoreSettingsClient({
+  siteDomain,
+  stores,
+}: {
+  siteDomain: string;
+  stores: StoreData[];
+}) {
   const [selectedId, setSelectedId] = useState(stores[0]?.id ?? "");
   const selected = stores.find((s) => s.id === selectedId) ?? stores[0];
 
@@ -60,12 +66,18 @@ export function StoreSettingsClient({ stores }: { stores: StoreData[] }) {
         </div>
       </div>
 
-      <StoreEditForm key={selected.id} store={selected} />
+      <StoreEditForm key={selected.id} store={selected} siteDomain={siteDomain} />
     </div>
   );
 }
 
-function StoreEditForm({ store }: { store: StoreData }) {
+function StoreEditForm({
+  store,
+  siteDomain,
+}: {
+  store: StoreData;
+  siteDomain: string;
+}) {
   const [state, action, pending] = useActionState(
     updateStoreByAdminAction,
     undefined,
@@ -103,9 +115,12 @@ function StoreEditForm({ store }: { store: StoreData }) {
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-gray-700">
-              رابط المتجر (النطاق الفرعي) *
+              رابط المتجر (المسار الفرعي) *
             </label>
             <div className="flex items-center overflow-hidden rounded-xl border border-gray-300 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-200">
+              <span className="border-l border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-bold text-gray-400 whitespace-nowrap" dir="ltr">
+                https://{siteDomain}/
+              </span>
               <input
                 name="slug"
                 defaultValue={store.slug}
@@ -113,12 +128,9 @@ function StoreEditForm({ store }: { store: StoreData }) {
                 dir="ltr"
                 className="w-full bg-transparent px-4 py-2.5 text-left text-sm outline-none"
               />
-              <span className="border-r border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-semibold text-gray-400 whitespace-nowrap">
-                .ai-hrj.xyz
-              </span>
             </div>
             <p className="mt-1.5 text-xs text-gray-400" dir="ltr">
-              {store.slug}.ai-hrj.xyz/ghazl/preview/{store.slug}
+              رابط المتجر الكامل: https://{siteDomain}/{store.slug}
             </p>
           </div>
           <div>
@@ -242,7 +254,7 @@ function StoreEditForm({ store }: { store: StoreData }) {
 
       <div className="flex items-center justify-between gap-3 border-t border-gray-100 pt-5">
         <a
-          href={`/preview/${store.slug}`}
+          href={`https://${siteDomain}/${store.slug}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-5 py-3 text-sm font-bold text-gray-600 transition hover:bg-gray-50"
