@@ -14,6 +14,7 @@ import {
   X,
   ExternalLink,
   Settings,
+  UserCog,
 } from "lucide-react";
 
 const NAV = [
@@ -21,6 +22,7 @@ const NAV = [
   { href: "/admin/stores", label: "المتاجر", icon: Store },
   { href: "/admin/subscriptions", label: "الاشتراكات", icon: CreditCard },
   { href: "/admin/customers", label: "العملاء", icon: Users },
+  { href: "/admin/users", label: "المستخدمون", icon: UserCog },
   { href: "/admin/analytics", label: "التقارير", icon: TrendingUp },
   { href: "/admin/settings", label: "الإعدادات", icon: Settings },
 ];
